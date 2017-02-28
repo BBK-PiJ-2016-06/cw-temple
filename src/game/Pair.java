@@ -44,7 +44,7 @@ public final class Pair<X, Y> {
   }
 
   /**
-   * Return a hash code based on both values in this obbject.
+   * Return a hash code based on both values in this object.
    */
   @Override
   public int hashCode() {

@@ -3,14 +3,14 @@ package game;
 import java.util.Objects;
 
 /**
- * An instance maintains the status of a node -- it's id and its distance from the Orb.
+ * An instance maintains the status of a node -- its id and its distance from the Orb.
  */
 public class NodeStatus implements Comparable<NodeStatus> {
   private final long id;
   private final int distance;
 
   /**
-   * Constructor: an instnce with id nodeId and distance dist.
+   * Constructor: an instance with id nodeId and distance dist.
    */
     /* package */ NodeStatus(long nodeId, int dist) {
     id = nodeId;
@@ -33,8 +33,8 @@ public class NodeStatus implements Comparable<NodeStatus> {
   }
 
   /**
-   * Return a negative number, 0, or a positive number depending on
-   * whether this is closer to, at the same ditance, or farther from the Orb.
+   * Return a negative number if this.distance is closer to orb, or a positive number if other.distance
+   * is closer to the orb, 0 if the same distance.
    */
   @Override
   public int compareTo(NodeStatus other) {

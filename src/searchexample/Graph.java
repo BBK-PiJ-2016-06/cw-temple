@@ -1,6 +1,7 @@
 package searchexample;
 
 public interface Graph {
+
   Node getRootNode();
 
   void setRootNode(Node node);

@@ -9,6 +9,7 @@ import java.util.Set;
  * An instance represents a node in the graph --the cavern.
  */
 public class Node {
+
   /**
    * The least positive fresh identifier available
    */
@@ -18,6 +19,7 @@ public class Node {
    * The unique numerical identifier of this Node
    */
   private final long id;
+
   /**
    * Represents the edges outgoing from this Node
    */
@@ -41,7 +43,7 @@ public class Node {
    */
     /* package */ Node(long givenId, Tile t) {
     id = givenId;
-    FRESH_ID = Math.max(FRESH_ID, givenId + 1);
+    FRESH_ID = Math.max(FRESH_ID, givenId + 1); // returns the larger of the two parameters.
     edges = new HashSet<>();
     neighbours = new HashSet<>();
 
@@ -101,7 +103,7 @@ public class Node {
   }
 
   /**
-   * Return truee if ob is a Node with the same id as this one.
+   * Return true if ob is a Node with the same id as this one.
    */
   @Override
   public boolean equals(Object ob) {

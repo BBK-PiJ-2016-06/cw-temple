@@ -32,7 +32,7 @@ public interface EscapeState {
 
   /**
    * Change your current location n.
-   * Throw an IllegalArgumentException if n is not a neihgbor of your current location.
+   * Throw an IllegalArgumentException if n is not a neighbor of your current location.
    */
   void moveTo(Node n);
 

@@ -19,7 +19,7 @@ public class GameState implements ExplorationState, EscapeState {
   private final Optional<GUI> gui;
   private final long seed;
 
-  private Node position;
+  private Node position; // starts as location of entrance, updates as one moves
   private int stepsTaken;
   private int timeRemaining;
   private int goldCollected;
@@ -217,7 +217,7 @@ public class GameState implements ExplorationState, EscapeState {
   @Override
   public long getCurrentLocation() {
     if (stage != Stage.EXPLORE) {
-      throw new IllegalStateException("getLocation() can only be called while exploring!");
+      throw new IllegalStateException("getCurrentLocation() can only be called while exploring!");
     }
 
     return position.getId();
@@ -234,7 +234,7 @@ public class GameState implements ExplorationState, EscapeState {
     }
 
     Collection<NodeStatus> options = new ArrayList<>();
-    for (Node n : position.getNeighbours()) {
+    for (Node n : position.getNeighbours()) { // returns a Set<Node> of current neighbors
       int distance = computeDistanceToTarget(n.getTile().getRow(), n.getTile().getColumn());
       options.add(new NodeStatus(n.getId(), distance));
     }
