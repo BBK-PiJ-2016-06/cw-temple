@@ -6,12 +6,14 @@ import game.NodeStatus;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Explorer {
 
   private Collection<NodeStatus> currentNeighbours;
-  private ArrayList<Long> visitedNodes = new ArrayList();
+  private ArrayList<NodeStatus> visitedNodeStatuses = new ArrayList();
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -46,9 +48,10 @@ public class Explorer {
   public void explore(ExplorationState state) {
     while (state.getDistanceToTarget() != 0) {
         currentNeighbours = state.getNeighbours();
-        long closestNode = returnNodeClosestToTarget();
-        state.moveTo(closestNode);
-        visitedNodes.add(closestNode);
+        NodeStatus closestNode = returnNodeStatusClosestToTarget();
+        state.moveTo(closestNode.getId());
+        visitedNodeStatuses.add(closestNode);
+        System.out.println(state.getDistanceToTarget() + " is distance to target");
     }
     return;
   }
@@ -60,12 +63,12 @@ public class Explorer {
      * If two nodes has equal distance, will return the most recent found
      * @return long the Id of the node closest to the target
      */
-  private long returnNodeClosestToTarget() {
+  private NodeStatus returnNodeStatusClosestToTarget() {
       return currentNeighbours.stream()
-              .filter( n -> !visitedNodes.contains(n.getId()) ) // removes all previously visited nodes
-              .min((n1, n2) -> Integer.compare(n1.getDistanceToTarget(), n2.getDistanceToTarget())) // gets node closest to target
-              .get()
-              .getId();
+              .filter( n -> !visitedNodeStatuses.contains(n) ) // removes all previously visited nodes
+              .min( (n1, n2) -> n1.compareTo(n2)) // gets node closest to target
+              //.get();
+              .orElseGet( () -> visitedNodeStatuses.get(visitedNodeStatuses.size() - 1)); // if nothing found, returns last visited
   }
 
   /**
