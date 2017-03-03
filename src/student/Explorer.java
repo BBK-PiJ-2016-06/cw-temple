@@ -70,8 +70,9 @@ public class Explorer {
 
     /**
      * Method which finds the Node with the closest distance to the target.
-     * If two nodes has equal distance, will return the most recent found
-     * @return long the Id of the node closest to the target
+     * Filters previously visited nodes and dead end nodes
+     * If two nodes have equal distanceToTarget, will return the first recent found
+     * @return NodeStatus the node closest to the target, or the current node if no suitable nodes found.
      */
   private NodeStatus returnNodeStatusClosestToTarget() {
       return currentNeighbours.stream()
