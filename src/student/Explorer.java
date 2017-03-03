@@ -4,16 +4,16 @@ import game.EscapeState;
 import game.ExplorationState;
 import game.NodeStatus;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Explorer {
 
   private Collection<NodeStatus> currentNeighbours;
-  private ArrayList<NodeStatus> visitedNodeStatuses = new ArrayList();
+  private Stack<NodeStatus> visitedNodeStatuses = new Stack();
+  private ArrayList<NodeStatus> exhaustedNodes = new ArrayList();
+  private NodeStatus currentNode;
+  private NodeStatus previousNode;
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -49,14 +49,24 @@ public class Explorer {
     while (state.getDistanceToTarget() != 0) {
         currentNeighbours = state.getNeighbours();
         NodeStatus closestNode = returnNodeStatusClosestToTarget();
-        state.moveTo(closestNode.getId());
-        visitedNodeStatuses.add(closestNode);
-        System.out.println(state.getDistanceToTarget() + " is distance to target");
+        if (closestNode.getId() == state.getCurrentLocation() ) {
+            NodeStatus previousNode = visitedNodeStatuses.pop();
+            exhaustedNodes.add(currentNode);
+            state.moveTo(previousNode.getId());
+            currentNode = previousNode;
+        } else {
+            state.moveTo(closestNode.getId());
+            visitedNodeStatuses.push(currentNode);
+            currentNode = closestNode;
+            // possibly in here, put a limit to how far away we are moving.
+        }
     }
     return;
   }
 
-  // note to self - check out Dijkstra's_algorithm
+    // note to self - check out Dijkstra's_algorithm
+    // this tutorial for A* http://www.policyalmanac.org/games/aStarTutorial.htm
+    // also this one: https://www.codeproject.com/Articles/9880/Very-simple-A-algorithm-implementation
 
     /**
      * Method which finds the Node with the closest distance to the target.
@@ -65,11 +75,11 @@ public class Explorer {
      */
   private NodeStatus returnNodeStatusClosestToTarget() {
       return currentNeighbours.stream()
-              .filter( n -> !visitedNodeStatuses.contains(n) ) // removes all previously visited nodes
-              .min( (n1, n2) -> n1.compareTo(n2)) // gets node closest to target
-              //.get();
-              .orElseGet( () -> visitedNodeStatuses.get(visitedNodeStatuses.size() - 1)); // if nothing found, returns last visited
+                  .filter(n -> !visitedNodeStatuses.contains(n) && !exhaustedNodes.contains(n) ) // removes all previously visited nodes
+                  .min((n1, n2) -> n1.compareTo(n2)) // gets node closest to target based on node Distance to Target
+                  .orElseGet( () -> currentNode);
   }
+
 
   /**
    * Escape from the cavern before the ceiling collapses, trying to collect as much

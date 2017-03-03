@@ -346,6 +346,7 @@ public class GameState implements ExplorationState, EscapeState {
   }
 
   boolean getExploreSucceeded() {
+    System.out.println("Explore Succeeded!");
     return exploreSucceeded;
   }
 
