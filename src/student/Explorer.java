@@ -6,11 +6,20 @@ import java.util.*;
 
 public class Explorer {
 
+    /**
+     * Objects needed for explore()
+     */
   private Collection<NodeStatus> currentNeighbours;
   private Stack<NodeStatus> visitedNodeStatuses = new Stack();
   private ArrayList<NodeStatus> exhaustedNodeStatuses = new ArrayList();
   private NodeStatus currentNodeStatus;
   private int bestScore;
+
+    /**
+     * Objects needed for escape()
+     */
+    private Map<Node, Node> openList = new TreeMap<>(); // Map<node, parentNode>
+    private ArrayList<Node> closedList = new ArrayList(); // Map<node, parentNode>
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -103,12 +112,27 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-     // while (!state.getCurrentNode().equals(state.getExit())) {
-          Node currentNode = state.getCurrentNode();
+      openList.put(state.getCurrentNode(), state.getCurrentNode());
+
+     while (!state.getCurrentNode().equals(state.getExit())) {
+         Node currentNode = returnOpenNodeWithLowestFCost();
+         state.getCurrentNode().getNeighbours()
+                               .stream()
+                               .filter(node -> !closedList.contains(node))
+                               .forEach( n -> openList.put(n, state.getCurrentNode()));
+         openList.remove(currentNode);
+         closedList.add(currentNode);
+
+
+
           Set<Node> currentNodeNeighbors = currentNode.getNeighbours();
           currentNodeNeighbors.forEach(node -> System.out.println("Length: " + currentNode.getEdge(node).length() + " from " +
-                  "currentNode to " + node.toString()));
-      //}
+                  "currentNode to " + node.toString() + " \n Manhattan Distance of neighour is: " + returnManhattanDistanceToExit(state.getExit(), node)));
+      }
+  }
+
+  private Node returnOpenNodeWithLowestFCost() {
+      return openList.entrySet().stream().min(node -> ) // min should find the lowest f cost... but how?
   }
 
   private int returnManhattanDistanceToExit(Node exit, Node inspect) {
