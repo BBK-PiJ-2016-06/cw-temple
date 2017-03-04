@@ -2,18 +2,18 @@ package student;
 
 import game.EscapeState;
 import game.ExplorationState;
+import game.Node;
 import game.NodeStatus;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Explorer {
 
   private Collection<NodeStatus> currentNeighbours;
   private Stack<NodeStatus> visitedNodeStatuses = new Stack();
-  private ArrayList<NodeStatus> exhaustedNodes = new ArrayList();
-  private NodeStatus currentNode;
-  private NodeStatus previousNode;
+  private ArrayList<NodeStatus> exhaustedNodeStatuses = new ArrayList();
+  private NodeStatus currentNodeStatus;
+  private int bestScore;
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -51,13 +51,13 @@ public class Explorer {
         NodeStatus closestNode = returnNodeStatusClosestToTarget();
         if (closestNode.getId() == state.getCurrentLocation() ) {
             NodeStatus previousNode = visitedNodeStatuses.pop();
-            exhaustedNodes.add(currentNode);
+            exhaustedNodeStatuses.add(currentNodeStatus);
             state.moveTo(previousNode.getId());
-            currentNode = previousNode;
+            currentNodeStatus = previousNode;
         } else {
             state.moveTo(closestNode.getId());
-            visitedNodeStatuses.push(currentNode);
-            currentNode = closestNode;
+            visitedNodeStatuses.push(currentNodeStatus);
+            currentNodeStatus = closestNode;
             // possibly in here, put a limit to how far away we are moving.
         }
     }
@@ -76,9 +76,9 @@ public class Explorer {
      */
   private NodeStatus returnNodeStatusClosestToTarget() {
       return currentNeighbours.stream()
-                  .filter(n -> !visitedNodeStatuses.contains(n) && !exhaustedNodes.contains(n) ) // removes all previously visited nodes
-                  .min((n1, n2) -> n1.compareTo(n2)) // gets node closest to target based on node Distance to Target
-                  .orElseGet( () -> currentNode);
+                  .filter(n -> !visitedNodeStatuses.contains(n) && !exhaustedNodeStatuses.contains(n) )
+                  .min((n1, n2) -> n1.compareTo(n2))
+                  .orElseGet( () -> currentNodeStatus);
   }
 
 
@@ -88,13 +88,13 @@ public class Explorer {
    * out, and this should be prioritized above collecting gold.
    * <p>
    * You now have access to the entire underlying graph, which can be accessed through EscapeState.
-   * getCurrentNode() and getExit() will return you Node objects of interest, and getVertices()
-   * will return a collection of all nodes on the graph.
+   * getCurrentNode() (returns Node) and getExit() (returns Node) will return you Node objects of interest,
+   * and getVertices() (returns Collection<Node>) will return a collection of all nodes on the graph.
    * <p>
    * Note that time is measured entirely in the number of steps taken, and for each step
    * the time remaining is decremented by the weight of the edge taken. You can use
-   * getTimeRemaining() to get the time still remaining, pickUpGold() to pick up any gold
-   * on your current tile (this will fail if no such gold exists), and moveTo() to move
+   * getTimeRemaining() (return int) to get the time still remaining, pickUpGold() to pick up any gold
+   * on your current tile (this will fail if no such gold exists), and moveTo(Node) to move
    * to a destination node adjacent to your current node.
    * <p>
    * You must return from this function while standing at the exit. Failing to do so before time
@@ -106,6 +106,11 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-    //TODO: Escape from the cavern before time runs out
+      while (!state.getCurrentNode().equals(state.getExit())) {
+          Node currentNode = state.getCurrentNode();
+          Set<Node> currentNodeNeighbors = currentNode.getNeighbours();
+          currentNodeNeighbors.forEach(node -> System.out.println("Length: " + currentNode.getEdge(node).length() + " from " +
+                  "currentNode to " + node.toString()));
+      }
   }
 }
