@@ -1,9 +1,6 @@
 package student;
 
-import game.EscapeState;
-import game.ExplorationState;
-import game.Node;
-import game.NodeStatus;
+import game.*;
 
 import java.util.*;
 
@@ -106,11 +103,17 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-      while (!state.getCurrentNode().equals(state.getExit())) {
+     // while (!state.getCurrentNode().equals(state.getExit())) {
           Node currentNode = state.getCurrentNode();
           Set<Node> currentNodeNeighbors = currentNode.getNeighbours();
           currentNodeNeighbors.forEach(node -> System.out.println("Length: " + currentNode.getEdge(node).length() + " from " +
                   "currentNode to " + node.toString()));
-      }
+      //}
+  }
+
+  private int returnManhattanDistanceToExit(Node exit, Node inspect) {
+      Tile exitT = exit.getTile();
+      Tile inspectT = inspect.getTile();
+      return ( Math.abs(exitT.getRow()-inspectT.getRow()) + Math.abs(exitT.getColumn()-inspectT.getColumn()) );
   }
 }
