@@ -117,7 +117,9 @@ public class Explorer {
       List<Node> shortestRoute = shortestPathToExit.retrieveShortestRoute();
       System.out.println("Shortest route is size: " + shortestRoute.size());
       for (int i = 0; i < shortestRoute.size(); i ++) {
-          state.getCurrentNode().getTile().takeGold();
+          if (state.getCurrentNode().getTile().getGold() > 0) {
+              state.pickUpGold();
+          }
           state.moveTo(shortestRoute.get(i));
       }
       return;
