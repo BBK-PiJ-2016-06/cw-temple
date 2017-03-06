@@ -3,6 +3,7 @@ package student;
 import game.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Explorer {
 
@@ -71,7 +72,6 @@ public class Explorer {
     return;
   }
 
-    // note to self - check out Dijkstra's_algorithm
     // this tutorial for A* http://www.policyalmanac.org/games/aStarTutorial.htm
     // also this one: https://www.codeproject.com/Articles/9880/Very-simple-A-algorithm-implementation
 
@@ -113,51 +113,7 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-      exitTile = state.getExit().getTile();
-      openList.put(state.getCurrentNode(), new NodeWrapper(state.getCurrentNode(), state.getCurrentNode(), state.getExit());
-
-     while (!state.getCurrentNode().equals(state.getExit())) {
-         Node currentNode = returnOpenNodeWithLowestFCost();
-         state.getCurrentNode().getNeighbours()
-                               .stream()
-                               .filter(node -> !closedList.contains(node))
-                               .forEach( n -> openList.put(n, state.getCurrentNode()));
-         openList.remove(currentNode);
-         closedList.add(currentNode);
-
-
-
-          Set<Node> currentNodeNeighbors = currentNode.getNeighbours();
+      AStarShortestPath shortestPathToExit = new AStarShortestPath(state.getCurrentNode(), state.getExit())
 
   }
-
-  private Node returnOpenNodeWithLowestFCost() {
-      return openList.entrySet()
-              .stream()
-              .min( (n1 , n2) -> );
-              .get()
-              .getKey(); // min should find the lowest f cost... but how?
-  }
-/*
-    /**
-     * Returns the F cost of the node to be inspected from the current node.
-     * Used to determine the optimal path from the current node to its neighbors
-     * @param current the current source node
-     * @param inspect the node whose distance we would like to determine
-     * @return the F cost = length of edge from current to inspect + inspect's Manhattan distance
-
-  private int getNodeFCost(Node current, Node inspect) {
-      return current.getEdge(inspect).length + returnManhattanDistanceToExit(inspect);
-  }
-
-    /**
-     * returns the Manhattan Distance of the node to be inspected from the exit tile
-     * @param inspect the Node for which we are determining the MD.
-     * @return the distance in int
-
-  private int returnManhattanDistanceToExit(Node inspect) {
-      Tile inspectT = inspect.getTile();
-      return ( Math.abs(exitTile.getRow() - inspectT.getRow()) + Math.abs(exitTile.getColumn() - inspectT.getColumn()) );
-  }
-  */
 }
