@@ -18,8 +18,9 @@ public class Explorer {
     /**
      * Objects needed for escape()
      */
-    private Map<Node, Node> openList = new TreeMap<>(); // Map<node, parentNode>
+    private Map<Node, NodeWrapper> openList = new TreeMap<>(); // Map<node, parentNode>
     private ArrayList<Node> closedList = new ArrayList(); // Map<node, parentNode>
+    private Tile exitTile;
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -112,7 +113,8 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-      openList.put(state.getCurrentNode(), state.getCurrentNode());
+      exitTile = state.getExit().getTile();
+      openList.put(state.getCurrentNode(), new NodeWrapper(state.getCurrentNode(), state.getCurrentNode(), state.getExit());
 
      while (!state.getCurrentNode().equals(state.getExit())) {
          Node currentNode = returnOpenNodeWithLowestFCost();
@@ -126,18 +128,36 @@ public class Explorer {
 
 
           Set<Node> currentNodeNeighbors = currentNode.getNeighbours();
-          currentNodeNeighbors.forEach(node -> System.out.println("Length: " + currentNode.getEdge(node).length() + " from " +
-                  "currentNode to " + node.toString() + " \n Manhattan Distance of neighour is: " + returnManhattanDistanceToExit(state.getExit(), node)));
-      }
+
   }
 
   private Node returnOpenNodeWithLowestFCost() {
-      return openList.entrySet().stream().min(node -> ) // min should find the lowest f cost... but how?
+      return openList.entrySet()
+              .stream()
+              .min( (n1 , n2) -> );
+              .get()
+              .getKey(); // min should find the lowest f cost... but how?
+  }
+/*
+    /**
+     * Returns the F cost of the node to be inspected from the current node.
+     * Used to determine the optimal path from the current node to its neighbors
+     * @param current the current source node
+     * @param inspect the node whose distance we would like to determine
+     * @return the F cost = length of edge from current to inspect + inspect's Manhattan distance
+
+  private int getNodeFCost(Node current, Node inspect) {
+      return current.getEdge(inspect).length + returnManhattanDistanceToExit(inspect);
   }
 
-  private int returnManhattanDistanceToExit(Node exit, Node inspect) {
-      Tile exitT = exit.getTile();
+    /**
+     * returns the Manhattan Distance of the node to be inspected from the exit tile
+     * @param inspect the Node for which we are determining the MD.
+     * @return the distance in int
+
+  private int returnManhattanDistanceToExit(Node inspect) {
       Tile inspectT = inspect.getTile();
-      return ( Math.abs(exitT.getRow()-inspectT.getRow()) + Math.abs(exitT.getColumn()-inspectT.getColumn()) );
+      return ( Math.abs(exitTile.getRow() - inspectT.getRow()) + Math.abs(exitTile.getColumn() - inspectT.getColumn()) );
   }
+  */
 }
