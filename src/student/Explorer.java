@@ -113,7 +113,14 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-      AStarShortestPath shortestPathToExit = new AStarShortestPath(state.getCurrentNode(), state.getExit())
-
+      AStarShortestPath shortestPathToExit = new AStarShortestPath(state.getCurrentNode(), state.getExit());
+      List<Node> shortestRoute = shortestPathToExit.retrieveShortestRoute();
+      System.out.println("Shortest route is size: " + shortestRoute.size());
+      for (int i = 0; i < shortestRoute.size(); i ++) {
+          state.getCurrentNode().getTile().takeGold();
+          state.moveTo(shortestRoute.get(i));
+      }
+      return;
   }
+
 }

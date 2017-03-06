@@ -15,31 +15,31 @@ public class AStarShortestPath {
     private Node destinationNode;
     private Boolean atDestination = false;
 
-    private Map<Node, NodeWrapper> openList = new TreeMap<>();
-    private ArrayList<Node> closedList = new ArrayList();
+    private Map<Node, NodeWrapper> openList = new HashMap<>();
+    private Map<Node, NodeWrapper> closedMap = new HashMap<>();
     private Tile destinationTile;
 
     public AStarShortestPath(Node starting, Node destination) {
         startingLocation = starting;
         destinationNode = destination;
         destinationTile = destination.getTile();
+        calculateShortestDistance();
     }
 
-    public void shortestDistance(){
+    private void calculateShortestDistance(){
         openList.put(startingLocation, new NodeWrapper(startingLocation, startingLocation, destinationNode));
 
          while (!atDestination) {
             Node currentNode = returnOpenNodeWithLowestFCost();
+            closedMap.put(currentNode, openList.get(currentNode));
             openList.remove(currentNode);
-            closedList.add(currentNode);
 
             if (currentNode.equals(destinationNode)) {
                 atDestination = true;
             } else {
-
                 Set<Node> validNeighbors = currentNode.getNeighbours()
                                                       .stream()
-                                                      .filter(node -> !closedList.contains(node))
+                                                      .filter(node -> !closedMap.containsKey(node))
                                                       .collect(Collectors.toSet());
 
                 for (Node n : validNeighbors) {
@@ -53,6 +53,32 @@ public class AStarShortestPath {
                 }
             }
          }
+    }
+
+    /**
+     * Method which retrieves the shortest route from the starting location to the destination.
+     * At this point, closedMap contains all evaluated Nodes, including the destination.
+     * Each node has a pointer to their "parent" which routes back to the starting location,
+     * method systematically retrieves and collects the pointers to the parents.
+     * Method ends once the starting location is found (does not add to the list)
+     * @return List<Node> a sequential route of nodes to follow from the starting location to the ending.
+     */
+    public List<Node> retrieveShortestRoute() {
+        List<Node> shortestRoute = new ArrayList<>(Arrays.asList(destinationNode));
+        System.out.println("destination is at R" + destinationTile.getRow() + " C" + destinationTile.getColumn());
+        Node childNode = destinationNode;
+        Boolean atOrigin = false;
+
+        while (!atOrigin) {
+            Node parentNode = closedMap.get(childNode).getParentNode();
+            if (parentNode.equals(startingLocation)) {
+                atOrigin = true;
+            } else {
+                shortestRoute.add(0, parentNode);
+                childNode = parentNode;
+            }
+        }
+        return shortestRoute;
     }
 
 
@@ -89,9 +115,10 @@ public class AStarShortestPath {
      * @param inspect the Node for which we are determining the MD.
      * @return the distance in int
      */
-  private int returnManhattanDistanceToExit(Node inspect) {
+    private int returnManhattanDistanceToExit(Node inspect) {
       Tile inspectT = inspect.getTile();
-      return ( Math.abs(destinationTile.getRow() - inspectT.getRow()) + Math.abs(destinationTile.getColumn() - inspectT.getColumn()) );
-  }
+      return ( Math.abs(destinationTile.getRow() - inspectT.getRow())
+                + Math.abs(destinationTile.getColumn() - inspectT.getColumn()) );
+    }
 
 }
