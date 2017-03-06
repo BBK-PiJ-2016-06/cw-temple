@@ -1,9 +1,6 @@
 package game;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -20,16 +17,16 @@ public class AStarShortestPath {
 
     private Map<Node, NodeWrapper> openList = new TreeMap<>();
     private ArrayList<Node> closedList = new ArrayList();
-    private Tile exitTile;
+    private Tile destinationTile;
 
     public AStarShortestPath(Node starting, Node destination) {
         startingLocation = starting;
         destinationNode = destination;
-        exitTile = destination.getTile();
+        destinationTile = destination.getTile();
     }
 
     public void shortestDistance(){
-        openList.put(startingLocation, new NodeWrapper(startingLocation, startingLocation, destinationNode);
+        openList.put(startingLocation, new NodeWrapper(startingLocation, startingLocation, destinationNode));
 
          while (!atDestination) {
             Node currentNode = returnOpenNodeWithLowestFCost();
@@ -38,22 +35,24 @@ public class AStarShortestPath {
 
             if (currentNode.equals(destinationNode)) {
                 atDestination = true;
-                break;
+            } else {
+
+                Set<Node> validNeighbors = currentNode.getNeighbours()
+                                                      .stream()
+                                                      .filter(node -> !closedList.contains(node))
+                                                      .collect(Collectors.toSet());
+
+                for (Node n : validNeighbors) {
+                    if (!openList.containsKey(n) || getNodeFCost(currentNode, n) < openList.get(n).getFinalCost()) {
+                        if (openList.containsKey(n)) {
+                            openList.get(n).setParentNode(currentNode); // also automatically changes nodeWrapper's FinalCost
+                        } else {
+                            openList.put(n, new NodeWrapper(n, currentNode, destinationNode));
+                        }
+                    }
+                }
             }
-
-
-            Set<Node> validNeighbors = currentNode.getNeighbours()
-                    .stream()
-                    .filter(node -> !closedList.contains(node))
-                    .collect(Collectors.toSet());
-
-
-            for(Node n: validNeighbors) {
-                if ( !openList.containsKey(n) || ){}
-            }
-            openList.remove(currentNode);
-            closedList.add(currentNode);
-            }
+         }
     }
 
 
@@ -82,17 +81,17 @@ public class AStarShortestPath {
      * @return the F cost = length of edge from current to inspect + inspect's Manhattan distance
      */
     private int getNodeFCost(Node current, Node inspect) {
-        return current.getEdge(inspect).length + inspect.;
+        return current.getEdge(inspect).length + returnManhattanDistanceToExit(inspect);
     }
-/*
+
     /**
      * returns the Manhattan Distance of the node to be inspected from the exit tile
      * @param inspect the Node for which we are determining the MD.
      * @return the distance in int
-
+     */
   private int returnManhattanDistanceToExit(Node inspect) {
       Tile inspectT = inspect.getTile();
-      return ( Math.abs(exitTile.getRow() - inspectT.getRow()) + Math.abs(exitTile.getColumn() - inspectT.getColumn()) );
+      return ( Math.abs(destinationTile.getRow() - inspectT.getRow()) + Math.abs(destinationTile.getColumn() - inspectT.getColumn()) );
   }
-  */
+
 }
