@@ -115,7 +115,6 @@ public class Explorer {
   public void escape(EscapeState state) {
       AStarShortestPath shortestPathToExit = new AStarShortestPath(state.getCurrentNode(), state.getExit());
       List<Node> shortestRoute = shortestPathToExit.retrieveShortestRoute();
-      System.out.println("Shortest route is size: " + shortestRoute.size());
       for (int i = 0; i < shortestRoute.size(); i ++) {
           if (state.getCurrentNode().getTile().getGold() > 0) {
               state.pickUpGold();
@@ -123,6 +122,18 @@ public class Explorer {
           state.moveTo(shortestRoute.get(i));
       }
       return;
+  }
+
+    /**
+     * method which calculates the total cost for travelling the route
+     * @param route the path of nodes to hypothetically travel
+     * @param start the beginning node for the route (not included in route when passed in)
+     * @return int the amount of time it will cost
+     */
+  private int getCostForRoute(List<Node> route, Node start) {
+      List<Node> fullRoute = route;
+      fullRoute.add(0, start);
+      return fullRoute.stream().mapToInt(n1 -> n1.getEdge(route.get(route.indexOf(n1) + 1)).length).sum();
   }
 
 }

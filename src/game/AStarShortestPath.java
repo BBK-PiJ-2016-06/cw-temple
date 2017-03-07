@@ -26,6 +26,9 @@ public class AStarShortestPath {
         calculateShortestDistance();
     }
 
+    /**
+     * Calculates the shortest route from this Node's starting location to its distance
+     */
     private void calculateShortestDistance(){
         openList.put(startingLocation, new NodeWrapper(startingLocation, startingLocation, destinationNode));
 
@@ -65,7 +68,6 @@ public class AStarShortestPath {
      */
     public List<Node> retrieveShortestRoute() {
         List<Node> shortestRoute = new ArrayList<>(Arrays.asList(destinationNode));
-        System.out.println("destination is at R" + destinationTile.getRow() + " C" + destinationTile.getColumn());
         Node childNode = destinationNode;
         Boolean atOrigin = false;
 

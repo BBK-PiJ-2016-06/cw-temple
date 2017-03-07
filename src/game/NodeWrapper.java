@@ -31,14 +31,11 @@ public class NodeWrapper implements Comparable<NodeWrapper> {
      * Calculates: finalCost = the edge length + heuristic (estimated) distance
      */
     public void setFinalCost() {
-        System.out.println("Parent is at: R" + parentNode.getTile().getRow() + " C" + parentNode.getTile().getColumn() );
-        System.out.println("This node is at: R" + node.getTile().getRow() + " C" + node.getTile().getColumn() );
         if (node.equals(parentNode)) { // must do this for starting location
             finalCost = Integer.MAX_VALUE;
         } else {
             finalCost = parentNode.getEdge(node).length + getManhattanDistance();
         }
-
     }
 
     public int getFinalCost() { return finalCost; }
