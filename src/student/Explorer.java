@@ -58,10 +58,7 @@ public class Explorer {
         currentNeighbours = state.getNeighbours();
         NodeStatus closestNode = returnNodeStatusClosestToTarget();
         if (closestNode.getId() == state.getCurrentLocation() ) {
-            NodeStatus previousNode = visitedNodeStatuses.pop();
-            exhaustedNodeStatuses.add(currentNodeStatus);
-            state.moveTo(previousNode.getId());
-            currentNodeStatus = previousNode;
+            moveBackwards(state);
         } else {
             state.moveTo(closestNode.getId());
             visitedNodeStatuses.push(currentNodeStatus);
@@ -72,8 +69,16 @@ public class Explorer {
     return;
   }
 
-    // http://www.policyalmanac.org/games/aStarTutorial.htm
-    // https://www.codeproject.com/Articles/9880/Very-simple-A-algorithm-implementation
+    /**
+     * Method which moves character backwards one space to previously traversed NodeStatus
+     * @param state the current state of the game
+     */
+  private void moveBackwards(ExplorationState state) {
+      NodeStatus previousNode = visitedNodeStatuses.pop();
+      exhaustedNodeStatuses.add(currentNodeStatus);
+      state.moveTo(previousNode.getId());
+      currentNodeStatus = previousNode;
+  }
 
     /**
      * Method which finds the Node with the closest distance to the target.
