@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
  *
  * Class which utilizes the A* Shortest path algorithm to find the shortest distance in a graph
  * between a starting location and a destination.
+ *
+ * Used these two tutorials: http://www.policyalmanac.org/games/aStarTutorial.htm
+ * https://www.codeproject.com/Articles/9880/Very-simple-A-algorithm-implementation
  */
 public class AStarShortestPath {
 
@@ -31,7 +34,8 @@ public class AStarShortestPath {
     }
 
     /**
-     * Calculates the shortest route from this Node's starting location to its distance
+     * Calculates the shortest route from this Node's starting location to its distance using the A*
+     * pathfinding algorithm.
      */
     private void calculateShortestDistance(){
         openList.put(startingLocation, new NodeWrapper(startingLocation, startingLocation, destinationNode));
@@ -65,10 +69,10 @@ public class AStarShortestPath {
     /**
      * Method which retrieves the shortest route from the starting location to the destination.
      * At this point, closedMap contains all evaluated Nodes, including the destination.
-     * Each node has a pointer to their "parent" which routes back to the starting location,
+     * Each key's value has a pointer to their "parent" which routes back to the starting location,
      * method systematically retrieves and collects the pointers to the parents.
      * Method ends once the starting location is found (does not add to the list)
-     * @return List<Node> a sequential route of nodes to follow from the starting location to the ending.
+     * @return List<Node> a sequential route of nodes to follow from a location to the ending.
      */
     private void calculateShortestRoute() {
         route = new ArrayList<>(Arrays.asList(destinationNode));
@@ -118,7 +122,7 @@ public class AStarShortestPath {
         } else {
             return openList.entrySet()
                     .stream()
-                    .min((n1, n2) -> n1.getValue().compareTo(n2.getValue()))
+                    .min(Comparator.comparing(Map.Entry::getValue))
                     .get()
                     .getKey();
         }

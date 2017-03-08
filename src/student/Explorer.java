@@ -72,8 +72,8 @@ public class Explorer {
     return;
   }
 
-    // this tutorial for A* http://www.policyalmanac.org/games/aStarTutorial.htm
-    // also this one: https://www.codeproject.com/Articles/9880/Very-simple-A-algorithm-implementation
+    // http://www.policyalmanac.org/games/aStarTutorial.htm
+    // https://www.codeproject.com/Articles/9880/Very-simple-A-algorithm-implementation
 
     /**
      * Method which finds the Node with the closest distance to the target.
@@ -114,6 +114,9 @@ public class Explorer {
    */
   public void escape(EscapeState state) {
       Boolean timeToExit = false;
+      if (state.getCurrentNode().getTile().getGold() > 0) {
+          state.pickUpGold();
+      }
       while(!timeToExit) {
           AStarShortestPath pathToNearestGold = getPathToClosestGoldNode(state);
           Node goldLocation = pathToNearestGold.getRoute().get(pathToNearestGold.getRoute().size()-1);
@@ -144,27 +147,36 @@ public class Explorer {
   }
 
     /**
-     * Finds the location of a Node containing gold and returns the shortest path to it
+     * Finds the location of all Nodes containing gold and returns the path to the nearest one.
      * @param state the current Escapestate of the game
      * @return the shortest path to the nearest node containing gold
      */
   private AStarShortestPath getPathToClosestGoldNode(EscapeState state) {
-      Set<Node> nodesWithGold = findAllNodesWithGold(state);
-      return nodesWithGold.stream()
+      Set<Node> richestNodes = findRichestNodes(state);
+      return  richestNodes.stream()
                           .map( node -> new AStarShortestPath(state.getCurrentNode(), node))
                           .min(Comparator.comparing(AStarShortestPath::getCostForRoute))
                           .orElseGet(null);
   }
 
     /**
-     * Method polls all nodes in the state and returns a Set of nodes which currently have gold
+     * Method polls all nodes in the state and returns a Set of nodes which currently have gold.
+     * Then finds single richest tile. Then filters through all gold nodes and returns those with
+     * at least 60% of the value. Found 60% to be optimal through testing. 
      * @param state the current state of our graph, the game
-     * @return a Set<Node> of all Nodes currently containing some gold.
+     * @return a Set<Node> of all Nodes currently containing gold within 60% of the richest node.
      */
-  private Set<Node> findAllNodesWithGold(EscapeState state) {
-      return state.getVertices().parallelStream()
-                                .filter( node -> node.getTile().getGold() > 0)
-                                .collect(Collectors.toSet());
+  private Set<Node> findRichestNodes(EscapeState state) {
+      Set<Node> nodesWithGold = state.getVertices().parallelStream()
+                                     .filter( node -> node.getTile().getGold() > 0)
+                                     .collect(Collectors.toSet());
+      Tile richestTile = nodesWithGold.parallelStream()
+                                      .map(Node::getTile)
+                                      .max(Comparator.comparing(Tile::getGold))
+                                      .orElseGet(null);
+      return nodesWithGold.stream()
+                          .filter( node -> node.getTile().getGold() > richestTile.getGold() * .6 )
+                          .collect(Collectors.toSet());
   }
 
 }
