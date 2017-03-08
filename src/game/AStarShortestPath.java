@@ -14,6 +14,8 @@ public class AStarShortestPath {
     private Node startingLocation;
     private Node destinationNode;
     private Boolean atDestination = false;
+    private List<Node> route;
+    private int costForRoute;
 
     private Map<Node, NodeWrapper> openList = new HashMap<>();
     private Map<Node, NodeWrapper> closedMap = new HashMap<>();
@@ -24,6 +26,8 @@ public class AStarShortestPath {
         destinationNode = destination;
         destinationTile = destination.getTile();
         calculateShortestDistance();
+        calculateShortestRoute();
+        calculateCostForRoute();
     }
 
     /**
@@ -66,8 +70,8 @@ public class AStarShortestPath {
      * Method ends once the starting location is found (does not add to the list)
      * @return List<Node> a sequential route of nodes to follow from the starting location to the ending.
      */
-    public List<Node> retrieveShortestRoute() {
-        List<Node> shortestRoute = new ArrayList<>(Arrays.asList(destinationNode));
+    private void calculateShortestRoute() {
+        route = new ArrayList<>(Arrays.asList(destinationNode));
         Node childNode = destinationNode;
         Boolean atOrigin = false;
 
@@ -76,11 +80,30 @@ public class AStarShortestPath {
             if (parentNode.equals(startingLocation)) {
                 atOrigin = true;
             } else {
-                shortestRoute.add(0, parentNode);
+                route.add(0, parentNode);
                 childNode = parentNode;
             }
         }
-        return shortestRoute;
+    }
+
+    public List<Node> getRoute() {
+        return route;
+    }
+
+    /**
+     * method which calculates the total cost for travelling the route
+     */
+    private void calculateCostForRoute() {
+        route.add(0, startingLocation);
+        costForRoute = 0;
+        for (int i = 0; i < route.size()-1; i++) {
+            costForRoute += route.get(i).getEdge(route.get(i+1)).length;
+        }
+        route.remove(0);
+    }
+
+    public int getCostForRoute() {
+        return costForRoute;
     }
 
 

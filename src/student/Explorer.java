@@ -113,31 +113,58 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-      AStarShortestPath shortestPathToExit = new AStarShortestPath(state.getCurrentNode(), state.getExit());
-      List<Node> shortestRoute = shortestPathToExit.retrieveShortestRoute();
-      for (int i = 0; i < shortestRoute.size(); i ++) {
-          if (state.getCurrentNode().getTile().getGold() > 0) {
-              state.pickUpGold();
+      Boolean timeToExit = false;
+      while(!timeToExit) {
+          AStarShortestPath pathToNearestGold = getPathToClosestGoldNode(state);
+          Node goldLocation = pathToNearestGold.getRoute().get(pathToNearestGold.getRoute().size()-1);
+          AStarShortestPath pathToExit = new AStarShortestPath(goldLocation, state.getExit());
+          if (pathToNearestGold.getCostForRoute() + pathToExit.getCostForRoute() > state.getTimeRemaining() ) {
+              timeToExit = true;
+          } else {
+              traversePath(pathToNearestGold, state);
           }
-          state.moveTo(shortestRoute.get(i));
       }
+      AStarShortestPath pathToEscape = new AStarShortestPath(state.getCurrentNode(), state.getExit());
+      traversePath(pathToEscape, state);
       return;
   }
 
     /**
-     * method which calculates the total cost for travelling the route
-     * @param route the path of nodes to hypothetically travel
-     * @param start the beginning node for the route (not included in route when passed in)
-     * @return int the amount of time it will cost
+     * Method which moves character on the determined route. Checks if there is gold along the path and picks up.
+     * @param path the shortest route from the current location to destination
+     * @param state the current state of the game
      */
-  private int getCostForRoute(List<Node> route, Node start) {
-      route.add(0, start);
-      int result = 0;
-      for (int i = 0; i < route.size()-1; i++) {
-          result += route.get(i).getEdge(route.get(i+1)).length;
+  private void traversePath(AStarShortestPath path, EscapeState state) {
+      for (int i = 0; i < path.getRoute().size(); i ++) {
+          state.moveTo(path.getRoute().get(i));
+          if (state.getCurrentNode().getTile().getGold() > 0) {
+              state.pickUpGold();
+          }
       }
-      route.remove(0);
-      return result;
+  }
+
+    /**
+     * Finds the location of a Node containing gold and returns the shortest path to it
+     * @param state the current Escapestate of the game
+     * @return the shortest path to the nearest node containing gold
+     */
+  private AStarShortestPath getPathToClosestGoldNode(EscapeState state) {
+      Set<Node> nodesWithGold = findAllNodesWithGold(state);
+      return nodesWithGold.stream()
+                          .map( node -> new AStarShortestPath(state.getCurrentNode(), node))
+                          .min(Comparator.comparing(AStarShortestPath::getCostForRoute))
+                          .orElseGet(null);
+  }
+
+    /**
+     * Method polls all nodes in the state and returns a Set of nodes which currently have gold
+     * @param state the current state of our graph, the game
+     * @return a Set<Node> of all Nodes currently containing some gold.
+     */
+  private Set<Node> findAllNodesWithGold(EscapeState state) {
+      return state.getVertices().parallelStream()
+                                .filter( node -> node.getTile().getGold() > 0)
+                                .collect(Collectors.toSet());
   }
 
 }
