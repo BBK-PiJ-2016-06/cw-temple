@@ -131,9 +131,13 @@ public class Explorer {
      * @return int the amount of time it will cost
      */
   private int getCostForRoute(List<Node> route, Node start) {
-      List<Node> fullRoute = route;
-      fullRoute.add(0, start);
-      return fullRoute.stream().mapToInt(n1 -> n1.getEdge(route.get(route.indexOf(n1) + 1)).length).sum();
+      route.add(0, start);
+      int result = 0;
+      for (int i = 0; i < route.size()-1; i++) {
+          result += route.get(i).getEdge(route.get(i+1)).length;
+      }
+      route.remove(0);
+      return result;
   }
 
 }
