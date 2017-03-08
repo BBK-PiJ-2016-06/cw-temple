@@ -14,7 +14,7 @@ public class Explorer {
   private Stack<NodeStatus> visitedNodeStatuses = new Stack();
   private ArrayList<NodeStatus> exhaustedNodeStatuses = new ArrayList();
   private NodeStatus currentNodeStatus;
-  private int bestScore;
+  private long bestNodeStatus;
 
     /**
      * Objects needed for escape()
@@ -54,6 +54,7 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
+      bestNodeStatus = state.getCurrentLocation();
     while (state.getDistanceToTarget() != 0) {
         currentNeighbours = state.getNeighbours();
         NodeStatus closestNode = returnNodeStatusClosestToTarget();
