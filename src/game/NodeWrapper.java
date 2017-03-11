@@ -25,12 +25,12 @@ public class NodeWrapper implements Comparable<NodeWrapper> {
         setFinalCost();
     }
 
-    public Node getParentNode() { return parentNode; }
+    public final Node getParentNode() { return parentNode; }
 
     /**
      * Calculates: finalCost = the edge length + heuristic (estimated) distance
      */
-    public void setFinalCost() {
+    private void setFinalCost() {
         if (node.equals(parentNode)) { // must do this for starting location
             finalCost = Integer.MAX_VALUE;
         } else {
@@ -38,13 +38,13 @@ public class NodeWrapper implements Comparable<NodeWrapper> {
         }
     }
 
-    public int getFinalCost() { return finalCost; }
+    public final int getFinalCost() { return finalCost; }
 
     /**
      * method which calculates the Manhattan Distance (rows away + columns away) from desired destination
      * @return the distance in int between current node and the destination
      */
-    public int getManhattanDistance() {
+    public final int getManhattanDistance() {
         Tile destinationT = destination.getTile();
         Tile thisT = node.getTile();
         return Math.abs(destinationT.getRow() - thisT.getRow()) + Math.abs(destinationT.getColumn() - thisT.getColumn());
@@ -55,7 +55,7 @@ public class NodeWrapper implements Comparable<NodeWrapper> {
      * is closer to the destination, 0 if the same distance.
      */
     @Override
-    public int compareTo(NodeWrapper other) {
+    public final int compareTo(NodeWrapper other) {
         return Integer.compare(this.finalCost, other.getFinalCost());
     }
 

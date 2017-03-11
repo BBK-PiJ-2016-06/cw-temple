@@ -14,14 +14,7 @@ public class Explorer {
   private Stack<NodeStatus> visitedNodeStatuses = new Stack();
   private ArrayList<NodeStatus> exhaustedNodeStatuses = new ArrayList();
   private NodeStatus currentNodeStatus;
-  private long bestNodeStatus;
 
-    /**
-     * Objects needed for escape()
-     */
-    private Map<Node, NodeWrapper> openList = new TreeMap<>(); // Map<node, parentNode>
-    private ArrayList<Node> closedList = new ArrayList(); // Map<node, parentNode>
-    private Tile exitTile;
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -54,7 +47,6 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
-      bestNodeStatus = state.getCurrentLocation();
     while (state.getDistanceToTarget() != 0) {
         currentNeighbours = state.getNeighbours();
         NodeStatus closestNode = returnNodeStatusClosestToTarget();
@@ -64,7 +56,6 @@ public class Explorer {
             state.moveTo(closestNode.getId());
             visitedNodeStatuses.push(currentNodeStatus);
             currentNodeStatus = closestNode;
-            // possibly in here, put a limit to how far away we are moving.
         }
     }
     return;
@@ -84,7 +75,7 @@ public class Explorer {
     /**
      * Method which finds the Node with the closest distance to the target.
      * Filters previously visited nodes and dead end nodes
-     * If two nodes have equal distanceToTarget, will return the first recent found
+     * If two nodes have equal distanceToTarget, will return the first found
      * @return NodeStatus the node closest to the target, or the current node if no suitable nodes found.
      */
   private NodeStatus returnNodeStatusClosestToTarget() {
