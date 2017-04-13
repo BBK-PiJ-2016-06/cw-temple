@@ -117,13 +117,17 @@ public class Explorer {
       state.pickUpGold();
     }
     while (!timeToExit) {
-      AStarShortestPath pathToNearestGold = getPathToClosestGoldNode(state);
-      Node goldLocation = pathToNearestGold.getRoute().get(pathToNearestGold.getRoute().size() - 1);
-      AStarShortestPath pathToExit = new AStarShortestPath(goldLocation, state.getExit());
-      if (pathToNearestGold.getCostForRoute() + pathToExit.getCostForRoute() > state.getTimeRemaining()) {
+      try {
+        AStarShortestPath pathToNearestGold = getPathToClosestGoldNode(state);
+        Node goldLocation = pathToNearestGold.getRoute().get(pathToNearestGold.getRoute().size() - 1);
+        AStarShortestPath pathToExit = new AStarShortestPath(goldLocation, state.getExit());
+        if (pathToNearestGold.getCostForRoute() + pathToExit.getCostForRoute() > state.getTimeRemaining()) {
+          timeToExit = true;
+        } else {
+          traversePath(pathToNearestGold, state);
+        }
+      } catch (NullPointerException noGoldLeft) {
         timeToExit = true;
-      } else {
-        traversePath(pathToNearestGold, state);
       }
     }
     AStarShortestPath pathToEscape = new AStarShortestPath(state.getCurrentNode(), state.getExit());
@@ -147,12 +151,14 @@ public class Explorer {
   }
 
   /**
-   * Finds the location of all Nodes containing gold and returns the path to the nearest one.
+   * Finds the location of Nodes containing the most gold
+   * and returns the path to the nearest one.
    *
-   * @param state the current Escapestate of the game
+   * @param state the current EscapeState of the game
    * @return the shortest path to the nearest node containing gold
+   * @throws NullPointerException if no gold remains on the map.
    */
-  private AStarShortestPath getPathToClosestGoldNode(EscapeState state) {
+  private AStarShortestPath getPathToClosestGoldNode(EscapeState state) throws NullPointerException {
     Set<Node> richestNodes = findRichestNodes(state);
     return richestNodes.stream()
             .map(node -> new AStarShortestPath(state.getCurrentNode(), node))
@@ -167,18 +173,22 @@ public class Explorer {
    *
    * @param state the current state of our graph, the game
    * @return a Set<Node> of all Nodes currently containing gold within 60% of the richest node.
+   * returns empty Set if all gold is collected.
    */
   private Set<Node> findRichestNodes(EscapeState state) {
     Set<Node> nodesWithGold = state.getVertices().parallelStream()
             .filter(node -> node.getTile().getGold() > 0)
             .collect(Collectors.toSet());
-    Tile richestTile = nodesWithGold.parallelStream()
-            .map(Node::getTile)
-            .max(Comparator.comparing(Tile::getGold))
-            .orElseGet(null);
-    return nodesWithGold.stream()
-            .filter(node -> node.getTile().getGold() > richestTile.getGold() * .6)
-            .collect(Collectors.toSet());
+    if (!nodesWithGold.isEmpty()) {
+      Tile richestTile = nodesWithGold.parallelStream()
+              .map(Node::getTile)
+              .max(Comparator.comparing(Tile::getGold))
+              .orElseGet(null);
+      nodesWithGold = nodesWithGold.stream()
+              .filter(node -> node.getTile().getGold() > richestTile.getGold() * .6)
+              .collect(Collectors.toSet());
+    }
+    return nodesWithGold;
   }
 
 }
