@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 
 public class Explorer {
 
-    /**
-     * Objects needed for explore()
-     */
+  /**
+   * Objects needed for explore()
+   */
   private Collection<NodeStatus> currentNeighbours;
   private Stack<NodeStatus> visitedNodeStatuses = new Stack();
   private ArrayList<NodeStatus> exhaustedNodeStatuses = new ArrayList();
@@ -48,41 +48,43 @@ public class Explorer {
    */
   public void explore(ExplorationState state) {
     while (state.getDistanceToTarget() != 0) {
-        currentNeighbours = state.getNeighbours();
-        NodeStatus closestNode = returnNodeStatusClosestToTarget();
-        if (closestNode.getId() == state.getCurrentLocation() ) {
-            moveBackwards(state);
-        } else {
-            state.moveTo(closestNode.getId());
-            visitedNodeStatuses.push(currentNodeStatus);
-            currentNodeStatus = closestNode;
-        }
+      currentNeighbours = state.getNeighbours();
+      NodeStatus closestNode = returnNodeStatusClosestToTarget();
+      if (closestNode.getId() == state.getCurrentLocation()) {
+        moveBackwards(state);
+      } else {
+        state.moveTo(closestNode.getId());
+        visitedNodeStatuses.push(currentNodeStatus);
+        currentNodeStatus = closestNode;
+      }
     }
     return;
   }
 
-    /**
-     * Method which moves character backwards one space to previously traversed NodeStatus
-     * @param state the current state of the game
-     */
+  /**
+   * Method which moves character backwards one space to previously traversed NodeStatus
+   *
+   * @param state the current state of the game
+   */
   private void moveBackwards(ExplorationState state) {
-      NodeStatus previousNode = visitedNodeStatuses.pop();
-      exhaustedNodeStatuses.add(currentNodeStatus);
-      state.moveTo(previousNode.getId());
-      currentNodeStatus = previousNode;
+    NodeStatus previousNode = visitedNodeStatuses.pop();
+    exhaustedNodeStatuses.add(currentNodeStatus);
+    state.moveTo(previousNode.getId());
+    currentNodeStatus = previousNode;
   }
 
-    /**
-     * Method which finds the Node with the closest distance to the target.
-     * Filters previously visited nodes and dead end nodes
-     * If two nodes have equal distanceToTarget, will return the first found
-     * @return NodeStatus the node closest to the target, or the current node if no suitable nodes found.
-     */
+  /**
+   * Method which finds the Node with the closest distance to the target.
+   * Filters previously visited nodes and dead end nodes
+   * If two nodes have equal distanceToTarget, will return the first found
+   *
+   * @return NodeStatus the node closest to the target, or the current node if no suitable nodes found.
+   */
   private NodeStatus returnNodeStatusClosestToTarget() {
-      return currentNeighbours.stream()
-                  .filter(n -> !visitedNodeStatuses.contains(n) && !exhaustedNodeStatuses.contains(n) )
-                  .min((n1, n2) -> n1.compareTo(n2))
-                  .orElseGet( () -> currentNodeStatus);
+    return currentNeighbours.stream()
+            .filter(n -> !visitedNodeStatuses.contains(n) && !exhaustedNodeStatuses.contains(n))
+            .min(NodeStatus::compareTo)
+            .orElseGet(() -> currentNodeStatus);
   }
 
 
@@ -110,70 +112,73 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-      Boolean timeToExit = false;
-      if (state.getCurrentNode().getTile().getGold() > 0) {
-          state.pickUpGold();
+    Boolean timeToExit = false;
+    if (state.getCurrentNode().getTile().getGold() > 0) {
+      state.pickUpGold();
+    }
+    while (!timeToExit) {
+      AStarShortestPath pathToNearestGold = getPathToClosestGoldNode(state);
+      Node goldLocation = pathToNearestGold.getRoute().get(pathToNearestGold.getRoute().size() - 1);
+      AStarShortestPath pathToExit = new AStarShortestPath(goldLocation, state.getExit());
+      if (pathToNearestGold.getCostForRoute() + pathToExit.getCostForRoute() > state.getTimeRemaining()) {
+        timeToExit = true;
+      } else {
+        traversePath(pathToNearestGold, state);
       }
-      while(!timeToExit) {
-          AStarShortestPath pathToNearestGold = getPathToClosestGoldNode(state);
-          Node goldLocation = pathToNearestGold.getRoute().get(pathToNearestGold.getRoute().size()-1);
-          AStarShortestPath pathToExit = new AStarShortestPath(goldLocation, state.getExit());
-          if (pathToNearestGold.getCostForRoute() + pathToExit.getCostForRoute() > state.getTimeRemaining() ) {
-              timeToExit = true;
-          } else {
-              traversePath(pathToNearestGold, state);
-          }
-      }
-      AStarShortestPath pathToEscape = new AStarShortestPath(state.getCurrentNode(), state.getExit());
-      traversePath(pathToEscape, state);
-      return;
+    }
+    AStarShortestPath pathToEscape = new AStarShortestPath(state.getCurrentNode(), state.getExit());
+    traversePath(pathToEscape, state);
+    return;
   }
 
-    /**
-     * Method which moves character on the determined route. Checks if there is gold along the path and picks up.
-     * @param path the shortest route from the current location to destination
-     * @param state the current state of the game
-     */
+  /**
+   * Method which moves character on the determined route. Checks if there is gold along the path and picks up.
+   *
+   * @param path  the shortest route from the current location to destination
+   * @param state the current state of the game
+   */
   private void traversePath(AStarShortestPath path, EscapeState state) {
-      for (int i = 0; i < path.getRoute().size(); i ++) {
-          state.moveTo(path.getRoute().get(i));
-          if (state.getCurrentNode().getTile().getGold() > 0) {
-              state.pickUpGold();
-          }
+    for (int i = 0; i < path.getRoute().size(); i++) {
+      state.moveTo(path.getRoute().get(i));
+      if (state.getCurrentNode().getTile().getGold() > 0) {
+        state.pickUpGold();
       }
+    }
   }
 
-    /**
-     * Finds the location of all Nodes containing gold and returns the path to the nearest one.
-     * @param state the current Escapestate of the game
-     * @return the shortest path to the nearest node containing gold
-     */
+  /**
+   * Finds the location of all Nodes containing gold and returns the path to the nearest one.
+   *
+   * @param state the current Escapestate of the game
+   * @return the shortest path to the nearest node containing gold
+   */
   private AStarShortestPath getPathToClosestGoldNode(EscapeState state) {
-      Set<Node> richestNodes = findRichestNodes(state);
-      return  richestNodes.stream()
-                          .map( node -> new AStarShortestPath(state.getCurrentNode(), node))
-                          .min(Comparator.comparing(AStarShortestPath::getCostForRoute))
-                          .orElseGet(null);
+    Set<Node> richestNodes = findRichestNodes(state);
+    return richestNodes.stream()
+            .map(node -> new AStarShortestPath(state.getCurrentNode(), node))
+            .min(Comparator.comparing(AStarShortestPath::getCostForRoute))
+            .orElseGet(null);
   }
 
-    /**
-     * Method polls all nodes in the state and returns a Set of nodes which currently have gold.
-     * Then finds single richest tile. Then filters through all gold nodes and returns those with
-     * at least 60% of the value. Found 60% to be optimal through testing. 
-     * @param state the current state of our graph, the game
-     * @return a Set<Node> of all Nodes currently containing gold within 60% of the richest node.
-     */
+  /**
+   * Method polls all nodes in the state and returns a Set of all nodes which currently have gold.
+   * Then finds single richest tile. Then filters through all gold nodes and returns those with
+   * at least 60% of the value. Found 60% to be optimal through manual testing.
+   *
+   * @param state the current state of our graph, the game
+   * @return a Set<Node> of all Nodes currently containing gold within 60% of the richest node.
+   */
   private Set<Node> findRichestNodes(EscapeState state) {
-      Set<Node> nodesWithGold = state.getVertices().parallelStream()
-                                     .filter( node -> node.getTile().getGold() > 0)
-                                     .collect(Collectors.toSet());
-      Tile richestTile = nodesWithGold.parallelStream()
-                                      .map(Node::getTile)
-                                      .max(Comparator.comparing(Tile::getGold))
-                                      .orElseGet(null);
-      return nodesWithGold.stream()
-                          .filter( node -> node.getTile().getGold() > richestTile.getGold() * .6 )
-                          .collect(Collectors.toSet());
+    Set<Node> nodesWithGold = state.getVertices().parallelStream()
+            .filter(node -> node.getTile().getGold() > 0)
+            .collect(Collectors.toSet());
+    Tile richestTile = nodesWithGold.parallelStream()
+            .map(Node::getTile)
+            .max(Comparator.comparing(Tile::getGold))
+            .orElseGet(null);
+    return nodesWithGold.stream()
+            .filter(node -> node.getTile().getGold() > richestTile.getGold() * .6)
+            .collect(Collectors.toSet());
   }
 
 }
