@@ -1,4 +1,7 @@
-package game;
+package student;
+
+import game.Node;
+import game.Tile;
 
 /**
  * Created by nathanhanak on 3/6/17.

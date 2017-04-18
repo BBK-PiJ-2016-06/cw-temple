@@ -1,4 +1,7 @@
-package game;
+package student;
+
+import game.Node;
+import game.Tile;
 
 import java.util.*;
 import java.util.stream.Collectors;
