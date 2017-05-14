@@ -97,10 +97,6 @@ public class NodeWrapper{
   /**
    * Return a negative number if this.finalCost is closer to our destination,
    * or a positive number if other.finalCost is closer to the destination, 0 if the same distance.
-   *
-   * Findbugs says "NodeWrapper defines compareTo(NodeWrapper) and uses Object.equals()"
-   * But Integer.compare's API says:
-   * "the value 0 if x == y; a value less than 0 if x < y; and a value greater than 0 if x > y"
    */
   public final int compareCosts(NodeWrapper other) {
     return Integer.compare(this.finalCost, other.getFinalCost());

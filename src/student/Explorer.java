@@ -8,11 +8,23 @@ import java.util.stream.Collectors;
 public class Explorer {
 
   /**
-   * Objects needed for explore()
+   * Collection of the current neighboring NodeStatus of the current NodeStatus in explore()
    */
   private Collection<NodeStatus> currentNeighbours;
+
+  /**
+   * A stack of NodeStatus objects which have previously been traversed. Used for backtracking
+   */
   private Stack<NodeStatus> visitedNodeStatuses = new Stack();
+
+  /**
+   * A list of NodeStatus objects which should no longer be considered for traversal
+   */
   private ArrayList<NodeStatus> exhaustedNodeStatuses = new ArrayList();
+
+  /**
+   * The NodeStatus on which the character is currently standing.
+   */
   private NodeStatus currentNodeStatus;
 
 
