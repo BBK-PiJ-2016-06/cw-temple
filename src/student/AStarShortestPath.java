@@ -126,7 +126,7 @@ public class AStarShortestPath {
     } else {
       return openList.entrySet()
               .stream()
-              .min(Comparator.comparing(Map.Entry::getValue))
+              .min(Map.Entry.comparingByValue(NodeWrapper::compareCosts))
               .get()
               .getKey();
     }

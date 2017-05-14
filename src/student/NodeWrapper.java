@@ -10,11 +10,26 @@ import game.Tile;
  * Needed to store Node's parent node and calculate the
  * distance from itself to a destination, whether it be an exit or a gold location.
  */
-public class NodeWrapper implements Comparable<NodeWrapper> {
+public class NodeWrapper{
 
+  /**
+   * The object of Node we are wrapping
+   */
   private final Node node;
+
+  /**
+   * The most recently updated Node which will be traversed before node
+   */
   private Node parentNode;
+
+  /**
+   * the Node which is the targeted destination of the A* route using this node
+   */
   private Node destination;
+
+  /**
+   * the time cost to get to this Node + its estimated distance to destination
+   */
   private int finalCost;
 
   /**
@@ -87,10 +102,8 @@ public class NodeWrapper implements Comparable<NodeWrapper> {
    * But Integer.compare's API says:
    * "the value 0 if x == y; a value less than 0 if x < y; and a value greater than 0 if x > y"
    */
-  @Override
-  public final int compareTo(NodeWrapper other) {
+  public final int compareCosts(NodeWrapper other) {
     return Integer.compare(this.finalCost, other.getFinalCost());
   }
-
 
 }
