@@ -27,7 +27,7 @@ sometimes explore routes that are unnecessary and bring him further away from th
 Attempted to implement a limit of how many "bad moves" Explorer could make, but this often ended up
 in infinite loops or program crashes. 
 
-# List of modified or created classes
+# List of modified or created classes used in solution
 
 Explorer.java
 
